@@ -1,237 +1,585 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Chatn't — Communication, But Worse</title>
 
-    <!-- Caveat is the cursive handwritten font intended for this design. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cinzel:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=11">
+
+    <!-- Handwritten fonts -->
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cinzel:wght@500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- Main stylesheet -->
+    <link
+        rel="stylesheet"
+        href="style.css?v=13"
+    >
+
 </head>
+
+
 <body>
 
+
+<!-- ==================================================
+     SPACE BACKGROUND
+================================================== -->
+
 <div class="space-bg">
+
     <div class="stars stars-a"></div>
+
     <div class="stars stars-b"></div>
+
     <div class="nebula nebula-a"></div>
+
     <div class="nebula nebula-b"></div>
+
     <div class="orbit o1"></div>
+
     <div class="orbit o2"></div>
+
     <div class="space-planet">🪐</div>
+
     <div class="space-moon">🌙</div>
+
     <div class="space-rocket">🚀</div>
+
 </div>
 
-<!-- NAME / IDENTITY SCREEN -->
-<section id="setupScreen" class="setup-screen">
-    <div class="setup-card">
-        <div class="setup-symbol">✦</div>
-        <h1>Chatn't</h1>
-        <p>You know what you said. They don't.</p>
 
-        <label>NAME FOR THIS WINDOW</label>
-        <input id="usernameInput" maxlength="24" placeholder="Enter a name">
-        <button id="startBtn">ENTER Chatn't ✦</button>
+
+<!-- ==================================================
+     NAME / IDENTITY SCREEN
+================================================== -->
+
+<section
+    id="setupScreen"
+    class="setup-screen"
+>
+
+    <div class="setup-card">
+
+        <div class="setup-symbol">
+            ✦
+        </div>
+
+
+        <h1>
+            Chatn't
+        </h1>
+
+
+        <p>
+            You know what you said. They don't.
+        </p>
+
+
+        <label>
+            NAME FOR THIS WINDOW
+        </label>
+
+
+        <input
+            id="usernameInput"
+            maxlength="24"
+            placeholder="Enter a name"
+            autocomplete="off"
+        >
+
+
+        <button id="startBtn">
+            ENTER Chatn't ✦
+        </button>
+
+
         <small id="setupError"></small>
 
+
         <div class="setup-note">
-            Open Chatn't in another window and choose a different name.
+
+            Open Chatn't in another window
+            and choose a different name.
+
         </div>
+
     </div>
+
 </section>
 
-<!-- APPLICATION -->
-<div id="chatScreen" class="app hidden">
+
+
+<!-- ==================================================
+     MAIN APPLICATION
+================================================== -->
+
+<div
+    id="chatScreen"
+    class="app hidden"
+>
+
+
+    <!-- ==================================================
+         SIDEBAR
+    ================================================== -->
 
     <aside class="sidebar">
+
         <div class="sidebar-inner">
 
+
+            <!-- BRAND -->
             <div class="brand-row">
+
                 <div>
-                    <h1>Chatn't</h1>
-                    <p>You know what you said. They don't.</p>
+
+                    <h1>
+                        Chatn't
+                    </h1>
+
+                    <p>
+                        You know what you said. They don't.
+                    </p>
+
                 </div>
-                <button id="addFriendBtn" class="plus-btn">+</button>
+
+
+                <button
+                    id="addFriendBtn"
+                    class="plus-btn"
+                    title="Add friend"
+                >
+                    +
+                </button>
+
             </div>
 
+
+
+            <!-- MY IDENTITY -->
             <div class="identity-card">
-                <div id="myAvatar" class="avatar">R</div>
+
+                <div
+                    id="myAvatar"
+                    class="avatar"
+                >
+                    R
+                </div>
+
+
                 <div class="identity-text">
-                    <strong id="myName">Rose</strong>
-                    <small>ID: <b id="myId">------</b></small>
+
+                    <strong id="myName">
+                        Rose
+                    </strong>
+
+
+                    <small>
+                        ID:
+                        <b id="myId">
+                            ------
+                        </b>
+                    </small>
+
                 </div>
-                <button id="copyIdBtn">Copy</button>
+
+
+                <button id="copyIdBtn">
+                    Copy
+                </button>
+
             </div>
 
-            <button id="addFriendLarge" class="add-friend">＋ &nbsp; ADD FRIEND</button>
 
-            <div class="folder-heading">✦ CONVERSATIONS ✦</div>
 
-            <!-- CHAT FOLDER -->
+            <!-- ADD FRIEND -->
+            <button
+                id="addFriendLarge"
+                class="add-friend"
+            >
+                ＋ &nbsp; ADD FRIEND
+            </button>
+
+
+
+            <!-- FOLDER TITLE -->
+            <div class="folder-heading">
+                ✦ CONVERSATIONS ✦
+            </div>
+
+
+
+            <!-- ==================================================
+                 CHAT FOLDER
+            ================================================== -->
+
             <div class="side-folder">
+
                 <div class="folder-header">
-                    <span class="folder-icon">💬</span>
-                    <span>CHAT</span>
-                    <b id="chatCount">0</b>
+
+                    <span class="folder-icon">
+                        💬
+                    </span>
+
+
+                    <span>
+                        CHAT
+                    </span>
+
+
+                    <b id="chatCount">
+                        0
+                    </b>
+
                 </div>
-                <div id="friendList" class="friend-list">
-                    <div class="empty-folder">No conversations yet.</div>
+
+
+                <div
+                    id="friendList"
+                    class="friend-list"
+                >
+
+                    <div class="empty-folder">
+                        No conversations yet.
+                    </div>
+
                 </div>
+
             </div>
 
-            <!-- LETTERS FOLDER -->
-            <div class="side-folder letters-folder">
-                <div class="folder-header">
-                    <span class="folder-icon">✉</span>
-                    <span>E-Letters Sent</span>
-                    <b id="letterCount">0</b>
-                </div>
-                <div id="letterList" class="letter-list">
-                    <div class="empty-folder">No letters yet.</div>
-                </div>
-            </div>
 
-            <div class="side-folder received-folder">
-                <div class="folder-header">
-                    <span class="folder-icon">📨</span>
-                    <span>E-Letters Received</span>
-                    <b id="receivedLetterCount">0</b>
-                </div>
-                <div id="receivedLetterList" class="letter-list">
-                    <div class="empty-folder">No letters received.</div>
-                </div>
-            </div>
 
+            <!-- SIDEBAR QUOTE -->
             <div class="sidebar-quote">
-                “Sending perfectly good messages<br>
+
+                “Sending perfectly good messages
+                <br>
                 to the wrong dimension.”
+
             </div>
+
+
         </div>
+
     </aside>
+
+
+
+    <!-- ==================================================
+         MAIN CHAT AREA
+    ================================================== -->
 
     <main class="main-area">
 
-        <!-- WELCOME -->
-        <section id="welcome" class="welcome">
-            <div class="welcome-icon">✦</div>
-            <h2>WELCOME TO Chatn't</h2>
-            <p>Choose a person from the conversation list.</p>
-            <p>Then say something perfectly understandable.</p>
-            <span>We will ruin it.</span>
+
+
+        <!-- ==================================================
+             WELCOME SCREEN
+        ================================================== -->
+
+        <section
+            id="welcome"
+            class="welcome"
+        >
+
+            <div class="welcome-icon">
+                ✦
+            </div>
+
+
+            <h2>
+                WELCOME TO Chatn't
+            </h2>
+
+
+            <p>
+                Choose a person from the conversation list.
+            </p>
+
+
+            <p>
+                Then say something perfectly understandable.
+            </p>
+
+
+            <span>
+                We will ruin it.
+            </span>
+
         </section>
 
-        <!-- CHAT -->
-        <section id="chatView" class="chat-view hidden">
 
+
+        <!-- ==================================================
+             CHAT VIEW
+        ================================================== -->
+
+        <section
+            id="chatView"
+            class="chat-view hidden"
+        >
+
+
+            <!-- CHAT HEADER -->
             <header class="chat-header">
-                <div id="chatAvatar" class="avatar large-avatar">A</div>
+
+
+                <div
+                    id="chatAvatar"
+                    class="avatar large-avatar"
+                >
+                    A
+                </div>
+
 
                 <div class="person-info">
-                    <h2 id="chatTitle">Friend</h2>
-                    <div id="chatStatus" class="offline"><i></i> Offline</div>
+
+                    <h2 id="chatTitle">
+                        Friend
+                    </h2>
+
+
+                    <div
+                        id="chatStatus"
+                        class="offline"
+                    >
+
+                        <i></i>
+
+                        Offline
+
+                    </div>
+
                 </div>
+
 
                 <div class="header-actions">
-                    <button id="chatModeBtn" class="mode-btn active">💬 <span>Chat</span></button>
-                    <button id="letterModeBtn" class="mode-btn">✉ <span>E-Letter</span></button>
-                    <button id="endChatBtn" class="end-btn">✕ End Chat</button>
+
+
+                    <!-- Only Chat remains -->
+                    <button
+                        class="mode-btn active"
+                    >
+                        💬
+                        <span>
+                            Chat
+                        </span>
+                    </button>
+
+
+                    <button
+                        id="endChatBtn"
+                        class="end-btn"
+                    >
+                        ✕ End Chat
+                    </button>
+
                 </div>
+
             </header>
 
-            <div id="letterNotice" class="letter-notice hidden">
-                ✉ Their window is closed. Ancient mail is available.
+
+
+            <!-- ==================================================
+                 MESSAGES
+            ================================================== -->
+
+            <div
+                id="chatMessages"
+                class="messages"
+            >
+
             </div>
 
-            <div id="chatMessages" class="messages"></div>
+
+
+            <!-- ==================================================
+                 MESSAGE COMPOSER
+            ================================================== -->
 
             <div class="composer-zone">
+
+
+                <!-- WARNING -->
                 <div class="warning-line">
-                    <span>⚠ EVERYTHING YOU SEND WILL BE JUMBLED.</span>
-                    <span>CHAOS: <b id="chaosValue">70%</b></span>
+
+                    <span>
+                        ⚠ EVERYTHING YOU SEND WILL BE JUMBLED.
+                    </span>
+
+
+                    <span>
+                        CHAOS:
+                        <b id="chaosValue">
+                            55%
+                        </b>
+                    </span>
+
                 </div>
 
+
+
+                <!-- CHAOS SLIDER -->
                 <div class="chaos-control">
-                    <span>CHAOS</span>
-                    <input id="chaosSlider" type="range" min="0" max="100" value="55">
-                    <strong id="chaosLabel">70%</strong>
+
+                    <span>
+                        CHAOS
+                    </span>
+
+
+                    <input
+                        id="chaosSlider"
+                        type="range"
+                        min="0"
+                        max="100"
+                        value="55"
+                    >
+
+
+                    <strong id="chaosLabel">
+                        55%
+                    </strong>
+
                 </div>
 
+
+
+                <!-- MESSAGE BOX -->
                 <div class="composer">
-                    <textarea id="messageInput" rows="1" maxlength="1000" placeholder="Type what you actually mean..."></textarea>
-                    <button id="sendBtn" class="send-btn" aria-label="Send">➤</button>
+
+
+                    <textarea
+                        id="messageInput"
+                        rows="1"
+                        maxlength="1000"
+                        placeholder="Type what you actually mean..."
+                    ></textarea>
+
+
+                    <button
+                        id="sendBtn"
+                        class="send-btn"
+                        aria-label="Send message"
+                        title="Send message"
+                    >
+                        ➤
+                    </button>
+
+
                 </div>
+
+
             </div>
+
+
         </section>
+
+
     </main>
+
+
 </div>
 
-<!-- LETTER POPUP: ONLY THIS AREA IS PARCHMENT; THE PAGE BEHIND STAYS SPACE -->
-<div id="letterOverlay" class="overlay hidden">
 
-    <div class="pamphlet">
 
-        <div class="scroll-roll roll-top"></div>
-        <div class="torn-outline"></div>
-        <button id="closeLetter" class="close-paper">×</button>
+<!-- ==================================================
+     ADD FRIEND POPUP
+================================================== -->
 
-        <div class="pamphlet-header">
-            <span>✦</span>
-            <div>
-                <small>E-LETTER</small>
-                <h2>E-Letter to <b id="letterRecipient">FRIEND</b></h2>
-            </div>
-            <span>✦</span>
-        </div>
+<div
+    id="friendModal"
+    class="overlay hidden"
+>
 
-        <div class="ornament">※　✧　※　✧　※</div>
 
-        <!-- Compose state -->
-        <div id="letterCompose" class="letter-compose">
-            <textarea id="letterInput" maxlength="10000" placeholder="Dear FRIEND...
-
-Write your essay here.
-
-This is an E-Letter, not a chat.
-Take your time."></textarea>
-
-            <div class="letter-footer">
-                <p>
-                    Perfectly written here.<br>
-                    Horribly received there.
-                </p>
-                <button id="sendLetterBtn">✈ SEND E-LETTER</button>
-            </div>
-        </div>
-
-        <!-- View state -->
-        <div id="letterView" class="letter-view hidden">
-            <div class="letter-view-label">✦ E-Letter Received ✦</div>
-            <div id="letterViewText" class="letter-view-text"></div>
-            <div class="letter-stamp">✈ LOST IN TRANSLATION</div>
-        </div>
-
-        <div class="scroll-roll roll-bottom"></div>
-    </div>
-</div>
-
-<!-- ADD FRIEND POPUP -->
-<div id="friendModal" class="overlay hidden">
     <div class="modal-paper">
-        <button id="closeModal" class="close-paper">×</button>
-        <h2>ADD A FRIEND 👤</h2>
-        <p>Enter their six-character Chatn't ID.</p>
-        <input id="friendIdInput" maxlength="6" placeholder="Example: A7K2Q9">
-        <button id="findFriendBtn">FIND FRIEND</button>
+
+
+        <button
+            id="closeModal"
+            class="close-paper"
+        >
+            ×
+        </button>
+
+
+        <h2>
+            ADD A FRIEND 👤
+        </h2>
+
+
+        <p>
+            Enter their six-character Chatn't ID.
+        </p>
+
+
+        <input
+            id="friendIdInput"
+            maxlength="6"
+            placeholder="Example: A7K2Q9"
+            autocomplete="off"
+        >
+
+
+        <button id="findFriendBtn">
+            FIND FRIEND
+        </button>
+
+
         <small id="friendError"></small>
+
+
     </div>
+
 </div>
 
-<div id="toast" class="toast"></div>
+
+
+<!-- ==================================================
+     TOAST
+================================================== -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+
+<!-- ==================================================
+     SOCKET.IO
+================================================== -->
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="app.js?v=11"></script>
+
+
+<!-- MAIN JAVASCRIPT -->
+
+<script src="app.js?v=13"></script>
+
+
 </body>
+
 </html>

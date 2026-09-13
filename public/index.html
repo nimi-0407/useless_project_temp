@@ -1,425 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatn't — Communication, But Worse</title>
 
+    <!-- Caveat is the cursive handwritten font intended for this design. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cinzel:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
 
+<div class="space-bg">
+    <div class="stars stars-a"></div>
+    <div class="stars stars-b"></div>
+    <div class="nebula nebula-a"></div>
+    <div class="nebula nebula-b"></div>
+    <div class="orbit o1"></div>
+    <div class="orbit o2"></div>
+    <div class="space-planet">🪐</div>
+    <div class="space-moon">🌙</div>
+    <div class="space-rocket">🚀</div>
+</div>
 
-    <!-- =========================
-         SETUP SCREEN
-    ========================== -->
+<!-- NAME / IDENTITY SCREEN -->
+<section id="setupScreen" class="setup-screen">
+    <div class="setup-card">
+        <div class="setup-symbol">✦</div>
+        <h1>CHATN'T</h1>
+        <p>You know what you said. They don't.</p>
 
-    <div id="setupScreen" class="screen">
+        <label>NAME FOR THIS WINDOW</label>
+        <input id="usernameInput" maxlength="24" placeholder="Enter a name">
+        <button id="startBtn">ENTER CHATN'T ✦</button>
+        <small id="setupError"></small>
 
-        <div class="setup-card">
-
-            <div class="logo">
-                💬
-            </div>
-
-            <h1>
-                Chatn't
-            </h1>
-
-            <p class="tagline">
-                You know what you said. They don't.
-            </p>
-
-            <p class="description">
-                A messaging app that deliberately
-                ruins communication.
-            </p>
-
-            <input
-                type="text"
-                id="usernameInput"
-                placeholder="Choose your username"
-                maxlength="24"
-            >
-
-            <button
-                id="startBtn"
-                class="primary-btn"
-            >
-                Enter Chatn't
-            </button>
-
-            <p
-                id="setupError"
-                class="error"
-            ></p>
-
+        <div class="setup-note">
+            Open Chatn't in another window/device and choose a different name.
         </div>
-
     </div>
+</section>
 
+<!-- APPLICATION -->
+<div id="chatScreen" class="app hidden">
 
+    <aside class="sidebar">
+        <div class="sidebar-inner">
 
-    <!-- =========================
-         MAIN APPLICATION
-    ========================== -->
-
-    <div
-        id="chatScreen"
-        class="app hidden"
-    >
-
-
-        <!-- =====================
-             SIDEBAR
-        ====================== -->
-
-        <aside class="sidebar">
-
-
-            <!-- BRAND -->
-
-            <div class="brand">
-
+            <div class="brand-row">
                 <div>
-
-                    <h1>
-                        Chatn't
-                    </h1>
-
-                    <p>
-                        Communication, but worse.
-                    </p>
-
+                    <h1>CHATN'T</h1>
+                    <p>You know what you said. They don't.</p>
                 </div>
-
-
-                <button
-                    id="addFriendBtn"
-                    class="add-friend-btn"
-                    title="Add Friend"
-                >
-                    +
-                </button>
-
+                <button id="addFriendBtn" class="plus-btn">+</button>
             </div>
 
-
-
-            <!-- MY PROFILE -->
-
-            <div class="profile">
-
-                <div
-                    class="avatar"
-                    id="myAvatar"
-                >
-                    🙂
+            <div class="identity-card">
+                <div id="myAvatar" class="avatar">R</div>
+                <div class="identity-text">
+                    <strong id="myName">Rose</strong>
+                    <small>ID: <b id="myId">------</b></small>
                 </div>
-
-
-                <div class="profile-info">
-
-                    <strong id="myName">
-                        You
-                    </strong>
-
-                    <small>
-
-                        ID:
-
-                        <span id="myId">
-                            ------
-                        </span>
-
-                    </small>
-
-                </div>
-
-
-                <button
-                    id="copyIdBtn"
-                    class="copy-btn"
-                >
-                    Copy
-                </button>
-
+                <button id="copyIdBtn">Copy</button>
             </div>
 
+            <button id="addFriendLarge" class="add-friend">＋ &nbsp; ADD FRIEND</button>
 
+            <div class="folder-heading">✦ CONVERSATIONS ✦</div>
 
-            <!-- CONVERSATIONS -->
-
-            <div class="section-title">
-                CONVERSATIONS
+            <!-- CHAT FOLDER -->
+            <div class="side-folder">
+                <div class="folder-header">
+                    <span class="folder-icon">💬</span>
+                    <span>CHAT</span>
+                    <b id="chatCount">0</b>
+                </div>
+                <div id="friendList" class="friend-list">
+                    <div class="empty-folder">No conversations yet.</div>
+                </div>
             </div>
 
-
-
-            <!-- FRIEND LIST -->
-
-            <div
-                id="friendList"
-                class="friend-list"
-            >
-
-                <div class="empty-friends">
-                    No conversations yet.
+            <!-- LETTERS FOLDER -->
+            <div class="side-folder letters-folder">
+                <div class="folder-header">
+                    <span class="folder-icon">✉</span>
+                    <span>LETTERS SENT</span>
+                    <b id="letterCount">0</b>
                 </div>
-
+                <div id="letterList" class="letter-list">
+                    <div class="empty-folder">No letters yet.</div>
+                </div>
             </div>
 
+            <div class="sidebar-quote">
+                “Sending perfectly good messages<br>
+                to the wrong dimension.”
+            </div>
+        </div>
+    </aside>
 
-        </aside>
+    <main class="main-area">
 
+        <!-- WELCOME -->
+        <section id="welcome" class="welcome">
+            <div class="welcome-icon">✦</div>
+            <h2>WELCOME TO CHATN'T</h2>
+            <p>Choose a person from the conversation list.</p>
+            <p>Then say something perfectly understandable.</p>
+            <span>We will ruin it.</span>
+        </section>
 
+        <!-- CHAT -->
+        <section id="chatView" class="chat-view hidden">
 
-        <!-- =========================
-             CHAT AREA
-        ========================== -->
+            <header class="chat-header">
+                <div id="chatAvatar" class="avatar large-avatar">A</div>
 
-        <main class="chat-area">
-
-
-            <!-- WELCOME -->
-
-            <div
-                id="welcome"
-                class="welcome"
-            >
-
-                <div class="welcome-icon">
-                    🗿
+                <div class="person-info">
+                    <h2 id="chatTitle">Friend</h2>
+                    <div id="chatStatus" class="offline"><i></i> Offline</div>
                 </div>
 
-                <h2>
-                    Welcome to Chatn't
-                </h2>
+                <div class="header-actions">
+                    <button id="chatModeBtn" class="mode-btn active">💬 <span>Chat</span></button>
+                    <button id="letterModeBtn" class="mode-btn">✉ <span>Letter</span></button>
+                    <button id="endChatBtn" class="end-btn">✕ End Chat</button>
+                </div>
+            </header>
 
-                <p>
-                    Add a friend and send a
-                    normal message.
-                </p>
-
-                <p>
-                    We'll make sure they receive
-                    something else.
-                </p>
-
+            <div id="letterNotice" class="letter-notice hidden">
+                ✉ Their window is closed. Ancient mail is available.
             </div>
 
+            <div id="chatMessages" class="messages"></div>
 
-
-            <!-- =====================
-                 CHAT VIEW
-            ====================== -->
-
-            <section
-                id="chatView"
-                class="chat-view hidden"
-            >
-
-
-                <!-- CHAT HEADER -->
-
-                <header class="chat-header">
-
-                    <div
-                        id="chatAvatar"
-                        class="avatar"
-                    >
-                        🙂
-                    </div>
-
-
-                    <div>
-
-                        <h2 id="chatTitle">
-                            Friend
-                        </h2>
-
-                        <small id="chatStatus">
-                            Online
-                        </small>
-
-                    </div>
-
-                </header>
-
-
-
-                <!-- MESSAGES -->
-
-                <div
-                    id="chatMessages"
-                    class="messages"
-                >
+            <div class="composer-zone">
+                <div class="warning-line">
+                    <span>⚠ EVERYTHING YOU SEND WILL BE JUMBLED.</span>
+                    <span>CHAOS: <b id="chaosValue">70%</b></span>
                 </div>
 
-
-
-                <!-- TYPING -->
-
-                <div
-                    id="typing"
-                    class="typing hidden"
-                >
-                    typing...
+                <div class="chaos-control">
+                    <span>CHAOS</span>
+                    <input id="chaosSlider" type="range" min="0" max="100" value="70">
+                    <strong id="chaosLabel">70%</strong>
                 </div>
 
-
-
-                <!-- =================
-                     INPUT AREA
-                ================== -->
-
-                <div class="input-area">
-
-
-                    <div class="warning">
-
-                        <span>
-                            ⚠️ Your message will be
-                            scrambled before delivery.
-                        </span>
-
-                        <span>
-                            Chaos: 70%
-                        </span>
-
-                    </div>
-
-
-
-                    <div class="composer">
-
-
-                        <textarea
-                            id="messageInput"
-                            rows="1"
-                            maxlength="500"
-                            placeholder="Type what you actually mean..."
-                        ></textarea>
-
-
-                        <button
-                            id="sendBtn"
-                            class="send-btn"
-                        >
-                            SEND
-                        </button>
-
-
-                    </div>
-
-
+                <div class="composer">
+                    <textarea id="messageInput" rows="1" maxlength="1000" placeholder="Type what you actually mean..."></textarea>
+                    <button id="sendBtn" class="send-btn" aria-label="Send">➤</button>
                 </div>
-
-
-            </section>
-
-
-        </main>
-
-
-    </div>
-
-
-
-    <!-- =========================
-         ADD FRIEND MODAL
-    ========================== -->
-
-    <div
-        id="friendModal"
-        class="modal hidden"
-    >
-
-        <div class="modal-card">
-
-
-            <button
-                id="closeModal"
-                class="close-btn"
-            >
-                ×
-            </button>
-
-
-            <h2>
-                Add a Friend 👤
-            </h2>
-
-
-            <p>
-                Enter your friend's Chatn't ID.
-            </p>
-
-
-            <input
-                type="text"
-                id="friendIdInput"
-                placeholder="Example: A7K2Q9"
-                maxlength="6"
-            >
-
-
-            <button
-                id="findFriendBtn"
-                class="primary-btn"
-            >
-                Find Friend
-            </button>
-
-
-            <p
-                id="friendError"
-                class="error"
-            ></p>
-
-
-            <div
-                id="friendResult"
-                class="friend-result hidden"
-            >
             </div>
+        </section>
+    </main>
+</div>
 
+<!-- LETTER POPUP: ONLY THIS AREA IS PARCHMENT; THE PAGE BEHIND STAYS SPACE -->
+<div id="letterOverlay" class="overlay hidden">
 
+    <div class="pamphlet">
+
+        <div class="scroll-roll roll-top"></div>
+        <div class="torn-outline"></div>
+        <button id="closeLetter" class="close-paper">×</button>
+
+        <div class="pamphlet-header">
+            <span>✦</span>
+            <div>
+                <small>ANCIENT CORRESPONDENCE</small>
+                <h2>LETTER TO <b id="letterRecipient">FRIEND</b></h2>
+            </div>
+            <span>✦</span>
         </div>
 
+        <div class="ornament">※　✧　※　✧　※</div>
+
+        <!-- Compose state -->
+        <div id="letterCompose" class="letter-compose">
+            <textarea id="letterInput" maxlength="10000" placeholder="Dear traveler...
+
+Write your essay here.
+
+This is a letter, not a chat.
+Take your time."></textarea>
+
+            <div class="letter-footer">
+                <p>
+                    Perfectly written here.<br>
+                    Horribly received there.
+                </p>
+                <button id="sendLetterBtn">✈ SEND LETTER</button>
+            </div>
+        </div>
+
+        <!-- View state -->
+        <div id="letterView" class="letter-view hidden">
+            <div class="letter-view-label">✦ LETTER RECEIVED ✦</div>
+            <div id="letterViewText" class="letter-view-text"></div>
+            <div class="letter-stamp">✈ LOST IN TRANSLATION</div>
+        </div>
+
+        <div class="scroll-roll roll-bottom"></div>
     </div>
+</div>
 
-
-
-    <!-- =========================
-         TOAST
-    ========================== -->
-
-    <div
-        id="toast"
-        class="toast"
-    >
+<!-- ADD FRIEND POPUP -->
+<div id="friendModal" class="overlay hidden">
+    <div class="modal-paper">
+        <button id="closeModal" class="close-paper">×</button>
+        <h2>ADD A FRIEND 👤</h2>
+        <p>Enter their six-character Chatn't ID.</p>
+        <input id="friendIdInput" maxlength="6" placeholder="Example: A7K2Q9">
+        <button id="findFriendBtn">FIND FRIEND</button>
+        <small id="friendError"></small>
     </div>
+</div>
 
+<div id="toast" class="toast"></div>
 
-
-    <!-- =========================
-         SOCKET.IO
-    ========================== -->
-
-    <script src="/socket.io/socket.io.js"></script>
-
-    <!-- OUR JAVASCRIPT -->
-
-    <script src="app.js"></script>
-
-
+<script src="/socket.io/socket.io.js"></script>
+<script src="app.js"></script>
 </body>
-
 </html>

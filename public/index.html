@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Chatn't — Communication, But Worse</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         SETUP SCREEN
+    ========================== -->
+
+    <div id="setupScreen" class="screen">
+
+        <div class="setup-card">
+
+            <div class="logo">
+                💬
+            </div>
+
+            <h1>
+                Chatn't
+            </h1>
+
+            <p class="tagline">
+                You know what you said. They don't.
+            </p>
+
+            <p class="description">
+                A messaging app that deliberately
+                ruins communication.
+            </p>
+
+            <input
+                type="text"
+                id="usernameInput"
+                placeholder="Choose your username"
+                maxlength="24"
+            >
+
+            <button
+                id="startBtn"
+                class="primary-btn"
+            >
+                Enter Chatn't
+            </button>
+
+            <p
+                id="setupError"
+                class="error"
+            ></p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         MAIN APPLICATION
+    ========================== -->
+
+    <div
+        id="chatScreen"
+        class="app hidden"
+    >
+
+
+        <!-- =====================
+             SIDEBAR
+        ====================== -->
+
+        <aside class="sidebar">
+
+
+            <!-- BRAND -->
+
+            <div class="brand">
+
+                <div>
+
+                    <h1>
+                        Chatn't
+                    </h1>
+
+                    <p>
+                        Communication, but worse.
+                    </p>
+
+                </div>
+
+
+                <button
+                    id="addFriendBtn"
+                    class="add-friend-btn"
+                    title="Add Friend"
+                >
+                    +
+                </button>
+
+            </div>
+
+
+
+            <!-- MY PROFILE -->
+
+            <div class="profile">
+
+                <div
+                    class="avatar"
+                    id="myAvatar"
+                >
+                    🙂
+                </div>
+
+
+                <div class="profile-info">
+
+                    <strong id="myName">
+                        You
+                    </strong>
+
+                    <small>
+
+                        ID:
+
+                        <span id="myId">
+                            ------
+                        </span>
+
+                    </small>
+
+                </div>
+
+
+                <button
+                    id="copyIdBtn"
+                    class="copy-btn"
+                >
+                    Copy
+                </button>
+
+            </div>
+
+
+
+            <!-- CONVERSATIONS -->
+
+            <div class="section-title">
+                CONVERSATIONS
+            </div>
+
+
+
+            <!-- FRIEND LIST -->
+
+            <div
+                id="friendList"
+                class="friend-list"
+            >
+
+                <div class="empty-friends">
+                    No conversations yet.
+                </div>
+
+            </div>
+
+
+        </aside>
+
+
+
+        <!-- =========================
+             CHAT AREA
+        ========================== -->
+
+        <main class="chat-area">
+
+
+            <!-- WELCOME -->
+
+            <div
+                id="welcome"
+                class="welcome"
+            >
+
+                <div class="welcome-icon">
+                    🗿
+                </div>
+
+                <h2>
+                    Welcome to Chatn't
+                </h2>
+
+                <p>
+                    Add a friend and send a
+                    normal message.
+                </p>
+
+                <p>
+                    We'll make sure they receive
+                    something else.
+                </p>
+
+            </div>
+
+
+
+            <!-- =====================
+                 CHAT VIEW
+            ====================== -->
+
+            <section
+                id="chatView"
+                class="chat-view hidden"
+            >
+
+
+                <!-- CHAT HEADER -->
+
+                <header class="chat-header">
+
+                    <div
+                        id="chatAvatar"
+                        class="avatar"
+                    >
+                        🙂
+                    </div>
+
+
+                    <div>
+
+                        <h2 id="chatTitle">
+                            Friend
+                        </h2>
+
+                        <small id="chatStatus">
+                            Online
+                        </small>
+
+                    </div>
+
+                </header>
+
+
+
+                <!-- MESSAGES -->
+
+                <div
+                    id="chatMessages"
+                    class="messages"
+                >
+                </div>
+
+
+
+                <!-- TYPING -->
+
+                <div
+                    id="typing"
+                    class="typing hidden"
+                >
+                    typing...
+                </div>
+
+
+
+                <!-- =================
+                     INPUT AREA
+                ================== -->
+
+                <div class="input-area">
+
+
+                    <div class="warning">
+
+                        <span>
+                            ⚠️ Your message will be
+                            scrambled before delivery.
+                        </span>
+
+                        <span>
+                            Chaos: 70%
+                        </span>
+
+                    </div>
+
+
+
+                    <div class="composer">
+
+
+                        <textarea
+                            id="messageInput"
+                            rows="1"
+                            maxlength="500"
+                            placeholder="Type what you actually mean..."
+                        ></textarea>
+
+
+                        <button
+                            id="sendBtn"
+                            class="send-btn"
+                        >
+                            SEND
+                        </button>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+
+    </div>
+
+
+
+    <!-- =========================
+         ADD FRIEND MODAL
+    ========================== -->
+
+    <div
+        id="friendModal"
+        class="modal hidden"
+    >
+
+        <div class="modal-card">
+
+
+            <button
+                id="closeModal"
+                class="close-btn"
+            >
+                ×
+            </button>
+
+
+            <h2>
+                Add a Friend 👤
+            </h2>
+
+
+            <p>
+                Enter your friend's Chatn't ID.
+            </p>
+
+
+            <input
+                type="text"
+                id="friendIdInput"
+                placeholder="Example: A7K2Q9"
+                maxlength="6"
+            >
+
+
+            <button
+                id="findFriendBtn"
+                class="primary-btn"
+            >
+                Find Friend
+            </button>
+
+
+            <p
+                id="friendError"
+                class="error"
+            ></p>
+
+
+            <div
+                id="friendResult"
+                class="friend-result hidden"
+            >
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         TOAST
+    ========================== -->
+
+    <div
+        id="toast"
+        class="toast"
+    >
+    </div>
+
+
+
+    <!-- =========================
+         SOCKET.IO
+    ========================== -->
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <!-- OUR JAVASCRIPT -->
+
+    <script src="app.js"></script>
+
+
+</body>
+
+</html>

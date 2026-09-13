@@ -2,12 +2,13 @@ const socket = io();
 
 let me = {};
 let currentFriend = null;
+const IDENTITY_KEY = "chatnt-window-identity-v8";
 let currentMode = "chat";
 let chaos = 55;
 
-const friends = JSON.parse(localStorage.getItem("chatnt-friends") || "{}");
-let sentLetters = JSON.parse(localStorage.getItem("chatnt-sent-letters") || "[]");
-let receivedLetters = JSON.parse(localStorage.getItem("chatnt-received-letters") || "[]");
+const friends = JSON.parse(localStorage.getItem("chatnt-friends-v10") || "{}");
+let sentLetters = JSON.parse(localStorage.getItem("chatnt-sent-eletters-v10") || "[]");
+let receivedLetters = JSON.parse(localStorage.getItem("chatnt-received-eletters-v10") || "[]");
 let online = {};
 
 const $ = id => document.getElementById(id);
@@ -83,11 +84,16 @@ function register() {
         return;
     }
 
-    socket.emit("register", name);
+    const saved = JSON.parse(sessionStorage.getItem(IDENTITY_KEY) || "null");
+    socket.emit("register", {
+        name,
+        chatntId: saved?.chatntId || ""
+    });
 }
 
 socket.on("registered", data => {
     me = data;
+    sessionStorage.setItem(IDENTITY_KEY, JSON.stringify(data));
     myName.textContent = me.username;
     myId.textContent = me.chatntId;
     myAvatar.textContent = initial(me.username);
@@ -135,19 +141,19 @@ function updateModeAvailability() {
     // Chat is enabled ONLY while recipient is online.
     chatModeBtn.disabled = !on;
 
-    // Letter is enabled ONLY while recipient is offline.
-    letterModeBtn.disabled = on;
+    // E-Letters are always available. They can be delivered live or queued if offline.
+    letterModeBtn.disabled = false;
 
-    letterNotice.classList.toggle("hidden", on);
+    letterNotice.classList.add("hidden");
 
-    if (on) setMode("chat");
+    if (!on && currentMode === "chat") setMode("letter");
 }
 
 
 // ---------------- FRIEND FOLDER ----------------
 
 function saveFriends() {
-    localStorage.setItem("chatnt-friends", JSON.stringify(friends));
+    localStorage.setItem("chatnt-friends-v10", JSON.stringify(friends));
 }
 
 function renderFriends() {
@@ -276,11 +282,6 @@ chatModeBtn.onclick = () => {
 letterModeBtn.onclick = () => {
     if (!currentFriend) return;
 
-    if (isOnline(currentFriend.chatntId)) {
-        showToast("Their window is open. Close it before sending ancient mail.");
-        return;
-    }
-
     openComposeLetter();
 };
 
@@ -355,45 +356,95 @@ sendLetterBtn.onclick = sendLetter;
 function sendLetter() {
     if (!currentFriend) return;
 
-    if (isOnline(currentFriend.chatntId)) {
-        showToast("Their window is open. Close it first.");
-        return;
-    }
-
     const text = letterInput.value.trim();
     if (!text) {
-        showToast("The parchment is blank.");
+        showToast("The pamphlet is blank.");
         return;
     }
 
-    launchPaperPlane();
+    const recipientId = currentFriend.chatntId;
+    const recipientName = currentFriend.username;
+    const pamphlet = document.querySelector(".pamphlet");
+    const composeOverlay = letterOverlay;
+
+    sendLetterBtn.disabled = true;
+
+    // Remember the written letter locally right away so the sender can see it
+    // even before the server acknowledgement arrives.
+    const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const localLetter = {
+        id: localId,
+        receiverId: recipientId,
+        receiverName: recipientName,
+        time: new Date().toISOString(),
+        text
+    };
+    sentLetters.unshift(localLetter);
+    sentLetters = sentLetters.slice(0, 50);
+    localStorage.setItem("chatnt-sent-eletters-v10", JSON.stringify(sentLetters));
+    renderLetters();
+
+    // Close the pamphlet without changing the underlying space background.
+    if (pamphlet) pamphlet.classList.add("transforming-to-plane");
 
     socket.emit("send-message", {
-        receiverId: currentFriend.chatntId,
+        receiverId: recipientId,
+        receiverName,
         message: text,
         mode: "letter",
         chaos
     });
+
+    // The sender sees the paper-plane flight too, aimed at the recipient card.
+    // The recipient receives a separate in-flight event so their screen also
+    // shows the plane crossing their existing space scene.
+    setTimeout(() => {
+        composeOverlay.classList.add("hidden");
+        if (pamphlet) pamphlet.classList.remove("transforming-to-plane");
+        letterInput.value = "";
+        sendLetterBtn.disabled = false;
+        launchPaperPlane(recipientId);
+    }, 800);
 }
 
 socket.on("letter-sent", message => {
-    sentLetters.unshift({
+    const localIndex = sentLetters.findIndex(x =>
+        x.receiverId === message.receiverId &&
+        x.text === (message.original || message.text) &&
+        x.id.startsWith("local-")
+    );
+
+    const finalLetter = {
         id: message.id,
         receiverId: message.receiverId,
         receiverName: message.receiverName,
         time: message.time,
         text: message.original || message.text
-    });
+    };
+
+    if (localIndex >= 0) sentLetters[localIndex] = finalLetter;
+    else sentLetters.unshift(finalLetter);
 
     sentLetters = sentLetters.slice(0, 50);
-    localStorage.setItem("chatnt-sent-letters", JSON.stringify(sentLetters));
-
+    localStorage.setItem("chatnt-sent-eletters-v10", JSON.stringify(sentLetters));
     renderLetters();
 
-    letterOverlay.classList.add("hidden");
-    letterInput.value = "";
+    // Show the compact sent event in the sender's current conversation.
+    if (currentFriend?.chatntId === message.receiverId &&
+        ![...chatMessages.querySelectorAll("[data-letter-id]")].some(el => el.dataset.letterId === message.id)) {
+        displayLetterEvent(message, true);
+        const last = chatMessages.lastElementChild;
+        if (last) last.dataset.letterId = message.id;
+        scrollMessages();
+    }
 
-    showToast("✈ Letter launched into the wrong dimension.");
+    showToast(`✈ E-Letter sent to ${message.receiverName}`);
+});
+
+// The recipient sees the plane cross their existing space background.
+// Nothing underneath changes colour and no parchment overlay is opened.
+socket.on("letter-in-flight", data => {
+    launchIncomingPaperPlane();
 });
 
 function renderLetters() {
@@ -500,7 +551,7 @@ socket.on("conversation-history", history => {
     });
 
     receivedLetters = receivedLetters.slice(0, 50);
-    localStorage.setItem("chatnt-received-letters", JSON.stringify(receivedLetters));
+    localStorage.setItem("chatnt-received-eletters-v10", JSON.stringify(receivedLetters));
     renderReceivedLetters();
 
     scrollMessages();
@@ -547,7 +598,7 @@ socket.on("receive-message", message => {
                 text: message.text
             });
             receivedLetters = receivedLetters.slice(0, 50);
-            localStorage.setItem("chatnt-received-letters", JSON.stringify(receivedLetters));
+            localStorage.setItem("chatnt-received-eletters-v10", JSON.stringify(receivedLetters));
             renderReceivedLetters();
             displayLetterEvent(message, false);
         } else {
@@ -565,7 +616,7 @@ socket.on("receive-message", message => {
                 text: message.text
             });
             receivedLetters = receivedLetters.slice(0, 50);
-            localStorage.setItem("chatnt-received-letters", JSON.stringify(receivedLetters));
+            localStorage.setItem("chatnt-received-eletters-v10", JSON.stringify(receivedLetters));
             renderReceivedLetters();
             showToast(`📨 Letter received from ${message.senderName} — open Letters Received`);
         } else {
@@ -682,20 +733,36 @@ copyIdBtn.onclick = async () => {
 
 // ---------------- PAPER PLANE ----------------
 
-function launchPaperPlane() {
+function launchIncomingPaperPlane() {
     const plane = document.createElement("div");
-    plane.className = "flying-plane";
+    plane.className = "flying-plane incoming-plane";
+    plane.innerHTML = `<span>✦</span>`;
+
+    // Start at the right side and sweep across the already-visible space scene.
+    // No overlay, no background colour change.
+    plane.style.left = `${window.innerWidth + 90}px`;
+    plane.style.top = `${window.innerHeight * 0.28}px`;
+    document.body.appendChild(plane);
+
+    requestAnimationFrame(() => plane.classList.add("fly-across-screen"));
+    setTimeout(() => plane.remove(), 4300);
+}
+
+function launchPaperPlane(recipientId) {
+    const plane = document.createElement("div");
+    plane.className = "flying-plane paper-plane-transform";
     plane.innerHTML = `<span>✦</span>`;
     document.body.appendChild(plane);
 
-    const target = currentFriend
-        ? document.querySelector(`.friend-item[data-friend-id="${CSS.escape(currentFriend.chatntId)}"]`)
+    const target = recipientId
+        ? document.querySelector(`.friend-item[data-friend-id="${CSS.escape(recipientId)}"]`)
         : null;
 
+    // Start where the centre of the pamphlet was.
     const startX = window.innerWidth * 0.58;
-    const startY = window.innerHeight * 0.68;
+    const startY = window.innerHeight * 0.50;
 
-    let targetX = window.innerWidth * 0.15;
+    let targetX = window.innerWidth * 0.16;
     let targetY = window.innerHeight * 0.45;
 
     if (target) {
@@ -713,12 +780,19 @@ function launchPaperPlane() {
 
     plane.style.setProperty("--dx", `${dx}px`);
     plane.style.setProperty("--dy", `${dy}px`);
+    plane.style.setProperty("--dx25", `${dx * .25}px`);
+    plane.style.setProperty("--dy25", `${dy * .25}px`);
+    plane.style.setProperty("--dx55", `${dx * .55}px`);
+    plane.style.setProperty("--dy55", `${dy * .55}px`);
+    plane.style.setProperty("--dx82", `${dx * .82}px`);
+    plane.style.setProperty("--dy82", `${dy * .82}px`);
     plane.style.setProperty("--angle", `${angle}deg`);
 
-    requestAnimationFrame(() => plane.classList.add("fly-to-person"));
-    setTimeout(() => plane.remove(), 1800);
+    // It appears as the folded paper plane and holds in the air for one second.
+    requestAnimationFrame(() => plane.classList.add("transform-to-plane"));
+    setTimeout(() => plane.classList.add("fly-to-person"), 1000);
+    setTimeout(() => plane.remove(), 5200);
 }
-
 
 // ---------------- HELPERS ----------------
 
@@ -741,3 +815,6 @@ function showToast(text) {
         toast.classList.remove("show");
     }, 3000);
 }
+socket.on("session-replaced", () => {
+    showToast("This Chatn't ID is open in another window.");
+});

@@ -151,15 +151,23 @@ function deliverWaitingLetters(user) {
 }
 
 io.on("connection", socket => {
-    socket.on("register", name => {
-        name = clean(name, 24);
+    socket.on("register", data => {
+        const name = clean(typeof data === "string" ? data : data?.name, 24);
+        const requestedId = clean(typeof data === "string" ? "" : data?.chatntId, 6).toUpperCase();
         if (!name) return;
 
-        // Every browser window gets its own name and Chatn't ID.
+        let chatntId = /^[A-Z0-9]{6}$/.test(requestedId) ? requestedId : uniqueId();
+
+        const previous = usersById.get(chatntId);
+        if (previous) {
+            io.to(previous.socketId).emit("session-replaced");
+            users.delete(previous.socketId);
+        }
+
         const user = {
             socketId: socket.id,
             username: name,
-            chatntId: uniqueId()
+            chatntId
         };
 
         users.set(socket.id, user);
@@ -209,16 +217,11 @@ io.on("connection", socket => {
         if (!receiverId || !original || receiverId === sender.chatntId) return;
 
         const receiver = usersById.get(receiverId);
+        const requestedReceiverName = clean(data?.receiverName, 24);
 
-        // Chat requires the other browser window to be open.
+        // Chat is live-only. E-Letters can be sent whether the person is online or offline.
         if (mode === "chat" && !receiver) {
-            socket.emit("message-error", "They're offline. Use the letter folder instead.");
-            return;
-        }
-
-        // Letter requires the other browser window to be closed.
-        if (mode === "letter" && receiver) {
-            socket.emit("message-error", "Their window is still open. Close it before sending a letter.");
+            socket.emit("message-error", "They're offline. Send an E-Letter instead.");
             return;
         }
 
@@ -227,7 +230,7 @@ io.on("connection", socket => {
             senderId: sender.chatntId,
             senderName: sender.username,
             receiverId,
-            receiverName: receiver ? receiver.username : "Offline Traveler",
+            receiverName: receiver ? receiver.username : (requestedReceiverName || "Friend"),
             original,
             text: jumble(original, chaos),
             mode,
@@ -236,10 +239,37 @@ io.on("connection", socket => {
         };
 
         if (mode === "letter") {
-            if (!waitingLetters.has(receiverId)) waitingLetters.set(receiverId, []);
-            waitingLetters.get(receiverId).push(message);
+            // E-Letters work whether the recipient is online or offline.
+            // Online: save and deliver immediately. Offline: queue for reconnect.
+            if (receiver) {
+                // Tell the recipient that a plane is on its way. The recipient
+                // sees the plane flying over their existing space screen; the
+                // actual letter arrives when the flight finishes.
+                io.to(receiver.socketId).emit("letter-in-flight", {
+                    id: message.id,
+                    senderId: message.senderId,
+                    senderName: message.senderName,
+                    receiverId: message.receiverId,
+                    receiverName: message.receiverName
+                });
 
-            // Sender gets the normal text and the receiver later gets the jumbled text.
+                save(message);
+                setTimeout(() => {
+                    // The socket may have disconnected during the flight.
+                    const currentReceiver = usersById.get(receiverId);
+                    if (currentReceiver) {
+                        io.to(currentReceiver.socketId).emit("receive-message", message);
+                    } else {
+                        if (!waitingLetters.has(receiverId)) waitingLetters.set(receiverId, []);
+                        waitingLetters.get(receiverId).push(message);
+                    }
+                }, 4200);
+            } else {
+                if (!waitingLetters.has(receiverId)) waitingLetters.set(receiverId, []);
+                waitingLetters.get(receiverId).push(message);
+            }
+
+            // Sender always sees their own readable copy immediately.
             const senderLetter = { ...message, text: original };
             socket.emit("message-sent", senderLetter);
             socket.emit("letter-sent", senderLetter);
@@ -279,7 +309,8 @@ io.on("connection", socket => {
         broadcastPresence();
     });
 });
-
-httpServer.listen(PORT, () => {
-    console.log(`Chatn't server ready at http://localhost:${PORT}`);
+httpServer.listen(PORT, "0.0.0.0", () => {
+    console.log(`Chatn't server running on port ${PORT}`);
+    console.log(`Open on this computer: http://localhost:${PORT}`);
+    console.log(`For other devices: http://<YOUR-PC-IP>:${PORT}`);
 });

@@ -956,7 +956,7 @@ button{cursor:pointer}
     transform:translate(0,0);
 }
 .flying-plane.fly-to-person{
-    animation:flyToPerson 1.65s cubic-bezier(.2,.72,.16,1) forwards;
+    animation:flyToPerson 4.2s cubic-bezier(.2,.72,.16,1) forwards;
 }
 @keyframes flyToPerson{
     0%{
@@ -984,4 +984,96 @@ button{cursor:pointer}
 @media(max-width:680px){
     .friend-copy .friend-id{font-size:10px}
     .received-folder{display:none}
+}
+
+/* E-Letter paper-plane transformation and flight */
+.flying-plane{
+    width:120px;
+    height:82px;
+    filter:drop-shadow(0 0 9px rgba(232,189,114,.35));
+    transform-origin:center;
+}
+.flying-plane:before{width:108px;height:62px}
+.flying-plane:after{width:58px}
+.flying-plane.transform-to-plane{
+    animation:transformToPlane .45s ease-out forwards;
+}
+@keyframes transformToPlane{
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(-18deg) scale(.15)}
+    65%{opacity:1;transform:translate(-50%,-50%) rotate(8deg) scale(1.18)}
+    100%{opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(1)}
+}
+.flying-plane.fly-to-person{
+    animation:flyToPerson 4s cubic-bezier(.2,.72,.16,1) forwards;
+}
+@keyframes flyToPerson{
+    0%{opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(1)}
+    25%{opacity:1;transform:translate(calc(-50% + var(--dx25)),calc(-50% + var(--dy25))) rotate(var(--angle)) scale(1.08)}
+    55%{opacity:1;transform:translate(calc(-50% + var(--dx55)),calc(-50% + var(--dy55))) rotate(var(--angle)) scale(.95)}
+    82%{opacity:1;transform:translate(calc(-50% + var(--dx82)),calc(-50% + var(--dy82))) rotate(var(--angle)) scale(.75)}
+    100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--angle)) scale(.3)}
+}
+
+/* ---------------- E-LETTER TRANSFORMATION ---------------- */
+/* The actual writing surface stays a parchment pamphlet. On send it folds,
+   shrinks and becomes a tiny paper shape before the real plane takes over. */
+.pamphlet.transforming-to-plane{
+    animation:pamphletToPlane .8s cubic-bezier(.35,.05,.65,1) forwards !important;
+    transform-origin:50% 50%;
+    pointer-events:none;
+}
+@keyframes pamphletToPlane{
+    0%{opacity:1;transform:scale(1) rotate(0deg);clip-path:polygon(1% 3%,7% 1%,15% 3%,24% 0,33% 3%,43% 1%,53% 3%,64% 0,74% 3%,84% 1%,99% 3%,98% 14%,100% 27%,98% 40%,100% 53%,98% 67%,100% 82%,98% 98%,88% 96%,77% 100%,65% 97%,54% 100%,42% 97%,30% 100%,19% 97%,9% 100%,1% 97%,3% 84%,1% 70%,3% 57%,1% 44%,3% 30%,1% 16%)}
+    45%{opacity:1;transform:scale(.48) rotate(-12deg);clip-path:polygon(0 50%,100% 0,63% 100%,42% 57%)}
+    75%{opacity:1;transform:scale(.18) rotate(18deg);clip-path:polygon(0 50%,100% 0,63% 100%,42% 57%)}
+    100%{opacity:0;transform:scale(.06) rotate(28deg);clip-path:polygon(0 50%,100% 0,63% 100%,42% 57%)}
+}
+
+.flying-plane.transform-to-plane{
+    animation:planeAppear .45s cubic-bezier(.2,.8,.2,1) forwards !important;
+}
+@keyframes planeAppear{
+    0%{opacity:0;transform:translate(-50%,-50%) rotate(-25deg) scale(.08)}
+    70%{opacity:1;transform:translate(-50%,-50%) rotate(5deg) scale(1.18)}
+    100%{opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(1)}
+}
+.flying-plane.fly-to-person{
+    animation:realPlaneFlight 4s cubic-bezier(.18,.7,.14,1) forwards !important;
+}
+@keyframes realPlaneFlight{
+    0%{opacity:1;transform:translate(-50%,-50%) rotate(0deg) scale(1)}
+    18%{opacity:1;transform:translate(calc(-50% + var(--dx25)),calc(-50% + var(--dy25) - 65px)) rotate(var(--angle)) scale(1.08)}
+    38%{opacity:1;transform:translate(calc(-50% + var(--dx55)),calc(-50% + var(--dy55) - 115px)) rotate(var(--angle)) scale(1)}
+    62%{opacity:1;transform:translate(calc(-50% + var(--dx82)),calc(-50% + var(--dy82) - 55px)) rotate(var(--angle)) scale(.86)}
+    84%{opacity:1;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--angle)) scale(.68)}
+    100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--angle)) scale(.25)}
+}
+
+
+/* v11: recipient-side plane flight. The space background remains completely untouched. */
+.incoming-plane{
+    left:0!important;
+    top:0!important;
+    width:120px;
+    height:82px;
+    opacity:1;
+    transform-origin:center;
+    filter:drop-shadow(0 9px 12px rgba(0,0,0,.42));
+}
+.incoming-plane.fly-across-screen{
+    animation:incomingPlaneFlow 4.1s cubic-bezier(.18,.72,.16,1) forwards;
+}
+@keyframes incomingPlaneFlow{
+    0%{opacity:0;transform:translate(-130px,30px) rotate(-18deg) scale(.78)}
+    8%{opacity:1;transform:translate(-55px,15px) rotate(-10deg) scale(.95)}
+    30%{opacity:1;transform:translate(calc(28vw),-30px) rotate(3deg) scale(1.04)}
+    52%{opacity:1;transform:translate(calc(55vw),55px) rotate(9deg) scale(1)}
+    74%{opacity:1;transform:translate(calc(78vw),-15px) rotate(2deg) scale(.94)}
+    92%{opacity:1;transform:translate(calc(100vw + 40px),50px) rotate(14deg) scale(.78)}
+    100%{opacity:0;transform:translate(calc(100vw + 180px),90px) rotate(20deg) scale(.6)}
+}
+
+/* The paper remains the only parchment surface. The flight is transparent over space. */
+.flying-plane{
+    background:transparent!important;
 }

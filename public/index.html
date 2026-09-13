@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Cinzel:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 
@@ -29,16 +29,16 @@
 <section id="setupScreen" class="setup-screen">
     <div class="setup-card">
         <div class="setup-symbol">✦</div>
-        <h1>CHATN'T</h1>
+        <h1>Chatn't</h1>
         <p>You know what you said. They don't.</p>
 
         <label>NAME FOR THIS WINDOW</label>
         <input id="usernameInput" maxlength="24" placeholder="Enter a name">
-        <button id="startBtn">ENTER CHATN'T ✦</button>
+        <button id="startBtn">ENTER Chatn't ✦</button>
         <small id="setupError"></small>
 
         <div class="setup-note">
-            Open Chatn't in another window/device and choose a different name.
+            Open Chatn't in another window and choose a different name.
         </div>
     </div>
 </section>
@@ -51,7 +51,7 @@
 
             <div class="brand-row">
                 <div>
-                    <h1>CHATN'T</h1>
+                    <h1>Chatn't</h1>
                     <p>You know what you said. They don't.</p>
                 </div>
                 <button id="addFriendBtn" class="plus-btn">+</button>
@@ -86,7 +86,7 @@
             <div class="side-folder letters-folder">
                 <div class="folder-header">
                     <span class="folder-icon">✉</span>
-                    <span>LETTERS SENT</span>
+                    <span>E-Letters Sent</span>
                     <b id="letterCount">0</b>
                 </div>
                 <div id="letterList" class="letter-list">
@@ -97,7 +97,7 @@
             <div class="side-folder received-folder">
                 <div class="folder-header">
                     <span class="folder-icon">📨</span>
-                    <span>LETTERS RECEIVED</span>
+                    <span>E-Letters Received</span>
                     <b id="receivedLetterCount">0</b>
                 </div>
                 <div id="receivedLetterList" class="letter-list">
@@ -117,7 +117,7 @@
         <!-- WELCOME -->
         <section id="welcome" class="welcome">
             <div class="welcome-icon">✦</div>
-            <h2>WELCOME TO CHATN'T</h2>
+            <h2>WELCOME TO Chatn't</h2>
             <p>Choose a person from the conversation list.</p>
             <p>Then say something perfectly understandable.</p>
             <span>We will ruin it.</span>
@@ -136,7 +136,7 @@
 
                 <div class="header-actions">
                     <button id="chatModeBtn" class="mode-btn active">💬 <span>Chat</span></button>
-                    <button id="letterModeBtn" class="mode-btn">✉ <span>Letter</span></button>
+                    <button id="letterModeBtn" class="mode-btn">✉ <span>E-Letter</span></button>
                     <button id="endChatBtn" class="end-btn">✕ End Chat</button>
                 </div>
             </header>
@@ -180,8 +180,8 @@
         <div class="pamphlet-header">
             <span>✦</span>
             <div>
-                <small>ANCIENT CORRESPONDENCE</small>
-                <h2>LETTER TO <b id="letterRecipient">FRIEND</b></h2>
+                <small>E-LETTER</small>
+                <h2>E-Letter to <b id="letterRecipient">FRIEND</b></h2>
             </div>
             <span>✦</span>
         </div>
@@ -190,11 +190,11 @@
 
         <!-- Compose state -->
         <div id="letterCompose" class="letter-compose">
-            <textarea id="letterInput" maxlength="10000" placeholder="Dear traveler...
+            <textarea id="letterInput" maxlength="10000" placeholder="Dear FRIEND...
 
 Write your essay here.
 
-This is a letter, not a chat.
+This is an E-Letter, not a chat.
 Take your time."></textarea>
 
             <div class="letter-footer">
@@ -202,13 +202,13 @@ Take your time."></textarea>
                     Perfectly written here.<br>
                     Horribly received there.
                 </p>
-                <button id="sendLetterBtn">✈ SEND LETTER</button>
+                <button id="sendLetterBtn">✈ SEND E-LETTER</button>
             </div>
         </div>
 
         <!-- View state -->
         <div id="letterView" class="letter-view hidden">
-            <div class="letter-view-label">✦ LETTER RECEIVED ✦</div>
+            <div class="letter-view-label">✦ E-Letter Received ✦</div>
             <div id="letterViewText" class="letter-view-text"></div>
             <div class="letter-stamp">✈ LOST IN TRANSLATION</div>
         </div>
@@ -232,6 +232,6 @@ Take your time."></textarea>
 <div id="toast" class="toast"></div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="app.js"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

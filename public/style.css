@@ -923,3 +923,65 @@ button{cursor:pointer}
     .letter-footer{flex-direction:column;align-items:stretch}
     .letter-footer button{width:100%}
 }
+
+
+/* Reliable letter-writing layer: the text area is always above the parchment decoration. */
+.letter-compose{position:relative;z-index:20;min-height:0}
+.letter-compose textarea{position:relative;z-index:21;display:block;min-height:280px;pointer-events:auto;cursor:text;user-select:text;-webkit-user-select:text}
+.letter-footer{position:relative;z-index:22}
+.pamphlet-header,.ornament{position:relative;z-index:20}
+
+
+/* v5: show the Chatn't ID directly beneath each person's name */
+.friend-copy .friend-id{
+    display:block;
+    font-size:12px;
+    opacity:.48;
+    letter-spacing:.2px;
+}
+
+/* Received letters have their own folder; they are never mixed with Chat. */
+.received-folder{
+    background:rgba(255,246,211,.10);
+}
+.received-letter:hover{
+    background:rgba(255,249,224,.32);
+}
+
+/* The plane now travels to the actual recipient's conversation card. */
+.flying-plane{
+    left:0!important;
+    top:0!important;
+    margin:0;
+    transform:translate(0,0);
+}
+.flying-plane.fly-to-person{
+    animation:flyToPerson 1.65s cubic-bezier(.2,.72,.16,1) forwards;
+}
+@keyframes flyToPerson{
+    0%{
+        opacity:1;
+        transform:translate(0,0) rotate(var(--angle)) scale(1);
+    }
+    28%{
+        opacity:1;
+        transform:translate(calc(var(--dx)*.18),calc(var(--dy)*.12)) rotate(var(--angle)) scale(1.12);
+    }
+    65%{
+        opacity:1;
+        transform:translate(calc(var(--dx)*.65),calc(var(--dy)*.72)) rotate(var(--angle)) scale(.9);
+    }
+    92%{
+        opacity:1;
+        transform:translate(var(--dx),var(--dy)) rotate(var(--angle)) scale(.55);
+    }
+    100%{
+        opacity:0;
+        transform:translate(var(--dx),var(--dy)) rotate(var(--angle)) scale(.25);
+    }
+}
+
+@media(max-width:680px){
+    .friend-copy .friend-id{font-size:10px}
+    .received-folder{display:none}
+}

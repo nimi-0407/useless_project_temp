@@ -47,63 +47,80 @@ function shuffle(items) {
     return a;
 }
 
-function corruptWord(word, chaos) {
-    const chars = Array.from(word);
-    if (chars.length < 2) return word;
-
-    // Multiple Fisher-Yates passes: deliberately destroy spelling.
-    const passes = Math.max(2, Math.ceil(chaos / 22));
-    for (let p = 0; p < passes; p++) {
-        for (let i = chars.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [chars[i], chars[j]] = [chars[j], chars[i]];
-        }
-    }
-
-    return chars.join("");
-}
-
 function jumble(text, chaos) {
     const c = Math.max(0, Math.min(100, Number(chaos) || 70));
-    const words = text.split(/\s+/).filter(Boolean);
+    const EMOJIS = ["👽","🗿","🐸","🍌","🥔","🦆","💀","🤨","😂","🚀","🛸","🌚","✨","☄️","👾","🫠","🪐"];
+    const SYMBOLS = ["§","¤","※","∿","≈","∆","Ω","⌁","⊙","‡","¿","¡","~","^","*","⊛","⟡","⌀","†","ƒ","¥","₩","Ƶ"];
 
-    let damaged = words.map(word => {
-        let w = corruptWord(word, Math.max(c, 70));
+    // At normal Chaos 70 the receiver should NOT be able to read the sentence.
+    // We therefore scramble the entire character stream, not merely a few words.
+    const source = Array.from(String(text));
+    const letters = source.filter(ch => /[\p{L}\p{N}]/u.test(ch));
+    const punctuation = source.filter(ch => !/[\p{L}\p{N}\s]/u.test(ch));
 
-        // Replace some punctuation with nonsense punctuation/symbols.
-        if (Math.random() < 0.65) {
-            const symbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-            const pos = Math.floor(Math.random() * (w.length + 1));
-            w = w.slice(0, pos) + symbol + w.slice(pos);
+    // Shuffle every meaningful character several times.
+    let pool = [...letters];
+    const passes = Math.max(4, Math.ceil(c / 12));
+    for (let p = 0; p < passes; p++) {
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
         }
-
-        if (Math.random() < 0.38) {
-            w += SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-        }
-
-        return w;
-    });
-
-    // Destroy sentence/word order heavily.
-    damaged = shuffle(damaged);
-    if (c >= 50) damaged = shuffle(damaged);
-    if (c >= 70) damaged = shuffle(damaged);
-
-    let result = damaged.join(" ");
-
-    // Add nonsense tokens.
-    const amount = Math.max(3, Math.floor(c / 12));
-    for (let i = 0; i < amount; i++) {
-        const token = Math.random() < 0.58
-            ? EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
-            : SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
-        result += " " + token;
     }
 
-    if (c >= 45) result += " ???";
-    if (c >= 65) result += " ¿§Ω";
-    if (c >= 80) result += " ∿∿∿ " + EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
-    if (c >= 92) result += " ⟡⌀¤";
+    // Rebuild into deliberately uneven chunks so original words cannot be recognized.
+    const chunks = [];
+    let i = 0;
+    while (i < pool.length) {
+        const size = 1 + Math.floor(Math.random() * Math.min(6, pool.length - i));
+        let chunk = pool.slice(i, i + size).join("");
+        i += size;
+
+        // Break some chunks with alien symbols.
+        if (Math.random() < 0.78) {
+            const symbol = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+            const pos = Math.floor(Math.random() * (chunk.length + 1));
+            chunk = chunk.slice(0, pos) + symbol + chunk.slice(pos);
+        }
+        if (Math.random() < 0.42) {
+            chunk += SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        }
+        chunks.push(chunk);
+    }
+
+    // Destroy chunk order too.
+    for (let p = 0; p < 3; p++) {
+        for (let j = chunks.length - 1; j > 0; j--) {
+            const k = Math.floor(Math.random() * (j + 1));
+            [chunks[j], chunks[k]] = [chunks[k], chunks[j]];
+        }
+    }
+
+    let result = chunks.join(Math.random() < 0.5 ? " ~ " : " ∿ ");
+
+    // Keep punctuation, but put it in unrelated positions.
+    for (const mark of punctuation) {
+        if (Math.random() < 0.8 && result.length) {
+            const pos = Math.floor(Math.random() * result.length);
+            result = result.slice(0, pos) + mark + result.slice(pos);
+        }
+    }
+
+    // Add a generous amount of nonsense tokens.
+    const tokenCount = Math.max(5, Math.floor(c / 9));
+    for (let n = 0; n < tokenCount; n++) {
+        const token = Math.random() < 0.55
+            ? EMOJIS[Math.floor(Math.random() * EMOJIS.length)]
+            : SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+        const parts = result.split(" ");
+        const pos = Math.floor(Math.random() * (parts.length + 1));
+        parts.splice(pos, 0, token);
+        result = parts.join(" ");
+    }
+
+    if (c >= 55) result += " ???";
+    if (c >= 70) result += " ¿§Ω ⟡";
+    if (c >= 85) result += " ∿∿∿ 👽 ⌀¤";
 
     return result;
 }
@@ -211,6 +228,7 @@ io.on("connection", socket => {
             senderName: sender.username,
             receiverId,
             receiverName: receiver ? receiver.username : "Offline Traveler",
+            original,
             text: jumble(original, chaos),
             mode,
             chaos,
@@ -221,16 +239,17 @@ io.on("connection", socket => {
             if (!waitingLetters.has(receiverId)) waitingLetters.set(receiverId, []);
             waitingLetters.get(receiverId).push(message);
 
-            // Sender sees a compact "letter sent" event, not the full letter.
-            socket.emit("message-sent", message);
-            socket.emit("letter-sent", message);
+            // Sender gets the normal text and the receiver later gets the jumbled text.
+            const senderLetter = { ...message, text: original };
+            socket.emit("message-sent", senderLetter);
+            socket.emit("letter-sent", senderLetter);
             return;
         }
 
         save(message);
 
-        // Both screens receive the exact same corrupted message.
-        socket.emit("message-sent", message);
+        // Sender sees what they typed. Receiver sees only the corrupted version.
+        socket.emit("message-sent", { ...message, text: original });
         io.to(receiver.socketId).emit("receive-message", message);
     });
 

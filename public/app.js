@@ -3,10 +3,11 @@ const socket = io();
 let me = {};
 let currentFriend = null;
 let currentMode = "chat";
-let chaos = 70;
+let chaos = 55;
 
 const friends = JSON.parse(localStorage.getItem("chatnt-friends") || "{}");
 let sentLetters = JSON.parse(localStorage.getItem("chatnt-sent-letters") || "[]");
+let receivedLetters = JSON.parse(localStorage.getItem("chatnt-received-letters") || "[]");
 let online = {};
 
 const $ = id => document.getElementById(id);
@@ -32,8 +33,10 @@ const friendError = $("friendError");
 
 const friendList = $("friendList");
 const letterList = $("letterList");
+const receivedLetterList = $("receivedLetterList");
 const chatCount = $("chatCount");
 const letterCount = $("letterCount");
+const receivedLetterCount = $("receivedLetterCount");
 
 const welcome = $("welcome");
 const chatView = $("chatView");
@@ -94,6 +97,7 @@ socket.on("registered", data => {
 
     renderFriends();
     renderLetters();
+    renderReceivedLetters();
     showToast(`Welcome, ${me.username} ✦`);
 });
 
@@ -163,11 +167,13 @@ function renderFriends() {
 
         const item = document.createElement("button");
         item.className = "friend-item" + (currentFriend?.chatntId === id ? " selected" : "");
+        item.dataset.friendId = id;
 
         item.innerHTML = `
             <div class="friend-avatar">${escapeHTML(initial(friend.username))}</div>
             <div class="friend-copy">
                 <strong>${escapeHTML(friend.username)}</strong>
+                <small class="friend-id">ID: ${escapeHTML(friend.chatntId)}</small>
                 <small class="${on ? "online" : "offline"}"><i></i>${on ? "Online" : "Offline"}</small>
             </div>
         `;
@@ -376,7 +382,7 @@ socket.on("letter-sent", message => {
         receiverId: message.receiverId,
         receiverName: message.receiverName,
         time: message.time,
-        text: message.text
+        text: message.original || message.text
     });
 
     sentLetters = sentLetters.slice(0, 50);
@@ -416,6 +422,39 @@ function renderLetters() {
     });
 }
 
+function renderReceivedLetters() {
+    receivedLetterCount.textContent = receivedLetters.length;
+
+    if (!receivedLetters.length) {
+        receivedLetterList.innerHTML = `<div class="empty-folder">No letters received.</div>`;
+        return;
+    }
+
+    receivedLetterList.innerHTML = "";
+
+    receivedLetters.slice(0, 8).forEach(letter => {
+        const item = document.createElement("button");
+        item.className = "sent-letter received-letter";
+        item.innerHTML = `
+            <span class="mini-envelope">📨</span>
+            <div>
+                <strong>FROM ${escapeHTML(letter.senderName)}</strong>
+                <small>Click to open received letter</small>
+            </div>
+        `;
+        item.onclick = () => openReceivedLetter(letter);
+        receivedLetterList.appendChild(item);
+    });
+}
+
+function openReceivedLetter(letter) {
+    letterRecipient.textContent = letter.senderName;
+    letterCompose.classList.add("hidden");
+    letterView.classList.remove("hidden");
+    letterViewText.textContent = letter.text;
+    letterOverlay.classList.remove("hidden");
+}
+
 function openSentLetter(letter) {
     letterRecipient.textContent = letter.receiverName;
     letterCompose.classList.add("hidden");
@@ -443,8 +482,26 @@ socket.on("conversation-history", history => {
 
     history.forEach(message => {
         const mine = message.senderId === me.chatntId;
-        displayMessage(message, mine);
+
+        if (message.mode === "letter") {
+            if (!mine && !receivedLetters.some(x => x.id === message.id)) {
+                receivedLetters.unshift({
+                    id: message.id,
+                    senderId: message.senderId,
+                    senderName: message.senderName,
+                    time: message.time,
+                    text: message.text
+                });
+            }
+            displayLetterEvent(message, mine);
+        } else {
+            displayMessage(message, mine);
+        }
     });
+
+    receivedLetters = receivedLetters.slice(0, 50);
+    localStorage.setItem("chatnt-received-letters", JSON.stringify(receivedLetters));
+    renderReceivedLetters();
 
     scrollMessages();
 });
@@ -482,7 +539,16 @@ socket.on("receive-message", message => {
 
     if (currentFriend?.chatntId === message.senderId) {
         if (message.mode === "letter") {
-            // Receiver sees a small notification in chat.
+            receivedLetters.unshift({
+                id: message.id,
+                senderId: message.senderId,
+                senderName: message.senderName,
+                time: message.time,
+                text: message.text
+            });
+            receivedLetters = receivedLetters.slice(0, 50);
+            localStorage.setItem("chatnt-received-letters", JSON.stringify(receivedLetters));
+            renderReceivedLetters();
             displayLetterEvent(message, false);
         } else {
             displayMessage(message, false);
@@ -490,7 +556,21 @@ socket.on("receive-message", message => {
 
         scrollMessages();
     } else {
-        showToast(`✉ New letter from ${message.senderName}`);
+        if (message.mode === "letter") {
+            receivedLetters.unshift({
+                id: message.id,
+                senderId: message.senderId,
+                senderName: message.senderName,
+                time: message.time,
+                text: message.text
+            });
+            receivedLetters = receivedLetters.slice(0, 50);
+            localStorage.setItem("chatnt-received-letters", JSON.stringify(receivedLetters));
+            renderReceivedLetters();
+            showToast(`📨 Letter received from ${message.senderName} — open Letters Received`);
+        } else {
+            showToast(`New message from ${message.senderName}`);
+        }
     }
 });
 
@@ -500,7 +580,7 @@ function displayMessage(message, mine) {
     const row = document.createElement("article");
     row.className = `message ${mine ? "mine" : "theirs"} arrive`;
 
-    row.innerHTML = `<div class="chat-bubble">${escapeHTML(message.text)}</div>`;
+    row.innerHTML = `<div class="chat-bubble">${escapeHTML(mine && message.original ? message.original : message.text)}</div>`;
     chatMessages.appendChild(row);
 }
 
@@ -608,8 +688,34 @@ function launchPaperPlane() {
     plane.innerHTML = `<span>✦</span>`;
     document.body.appendChild(plane);
 
-    requestAnimationFrame(() => plane.classList.add("fly"));
+    const target = currentFriend
+        ? document.querySelector(`.friend-item[data-friend-id="${CSS.escape(currentFriend.chatntId)}"]`)
+        : null;
 
+    const startX = window.innerWidth * 0.58;
+    const startY = window.innerHeight * 0.68;
+
+    let targetX = window.innerWidth * 0.15;
+    let targetY = window.innerHeight * 0.45;
+
+    if (target) {
+        const r = target.getBoundingClientRect();
+        targetX = r.left + r.width * 0.55;
+        targetY = r.top + r.height * 0.50;
+    }
+
+    plane.style.left = `${startX}px`;
+    plane.style.top = `${startY}px`;
+
+    const dx = targetX - startX;
+    const dy = targetY - startY;
+    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+    plane.style.setProperty("--dx", `${dx}px`);
+    plane.style.setProperty("--dy", `${dy}px`);
+    plane.style.setProperty("--angle", `${angle}deg`);
+
+    requestAnimationFrame(() => plane.classList.add("fly-to-person"));
     setTimeout(() => plane.remove(), 1800);
 }
 

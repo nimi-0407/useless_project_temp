@@ -1,3 +1,19 @@
+
+
+https://github.com/user-attachments/assets/42edea58-ac18-4991-a74e-fa6131c0a295
+
+
+
+https://github.com/user-attachments/assets/6510f457-11a5-4684-a0fb-23ffae6ebd17
+
+
+
+https://github.com/user-attachments/assets/7993e51d-09d8-45de-b7cc-7ea00fe5872d
+
+
+
+https://github.com/user-attachments/assets/7a1c32b8-ec00-4cbf-be29-7f83526c202d
+
 <img width="1280" height="640" alt="Chatn't" src="https://github.com/user-attachments/assets/8920b256-2ba8-4988-b824-5351134eb4bd" />
 
 # Chatn't 🎯

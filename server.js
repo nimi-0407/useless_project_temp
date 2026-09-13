@@ -280,6 +280,8 @@ io.on("connection", socket => {
     });
 });
 
-httpServer.listen(PORT, () => {
-    console.log(`Chatn't server ready at http://localhost:${PORT}`);
+httpServer.listen(PORT, "0.0.0.0", () => {
+    console.log(`Chatn't server running on port ${PORT}`);
+    console.log(`Open on this computer: http://localhost:${PORT}`);
+    console.log(`For other devices: http://<YOUR-PC-IP>:${PORT}`);
 });
